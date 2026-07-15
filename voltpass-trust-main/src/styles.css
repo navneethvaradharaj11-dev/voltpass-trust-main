@@ -1,0 +1,125 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-electric: var(--electric);
+  --color-electric-glow: var(--electric-glow);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+:root {
+  --radius: 0.75rem;
+  /* Dark theme by default */
+  --background: oklch(0.16 0.02 250);
+  --foreground: oklch(0.97 0.01 240);
+  --card: oklch(0.21 0.025 250);
+  --card-foreground: oklch(0.97 0.01 240);
+  --popover: oklch(0.21 0.025 250);
+  --popover-foreground: oklch(0.97 0.01 240);
+  --primary: oklch(0.72 0.19 235);
+  --primary-foreground: oklch(0.12 0.02 250);
+  --secondary: oklch(0.27 0.03 250);
+  --secondary-foreground: oklch(0.97 0.01 240);
+  --muted: oklch(0.24 0.025 250);
+  --muted-foreground: oklch(0.68 0.03 250);
+  --accent: oklch(0.30 0.05 230);
+  --accent-foreground: oklch(0.97 0.01 240);
+  --destructive: oklch(0.64 0.22 25);
+  --destructive-foreground: oklch(0.98 0.01 0);
+  --success: oklch(0.72 0.19 150);
+  --success-foreground: oklch(0.12 0.02 150);
+  --warning: oklch(0.80 0.17 75);
+  --warning-foreground: oklch(0.18 0.05 75);
+  --electric: oklch(0.72 0.19 235);
+  --electric-glow: oklch(0.78 0.22 220);
+  --border: oklch(0.30 0.03 250 / 0.6);
+  --input: oklch(0.28 0.03 250);
+  --ring: oklch(0.72 0.19 235);
+  --chart-1: oklch(0.72 0.19 235);
+  --chart-2: oklch(0.72 0.19 150);
+  --chart-3: oklch(0.80 0.17 75);
+  --chart-4: oklch(0.64 0.22 25);
+  --chart-5: oklch(0.65 0.20 290);
+
+  --gradient-hero: radial-gradient(ellipse 80% 60% at 50% 0%, oklch(0.72 0.19 235 / 0.18), transparent 70%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.72 0.19 235), oklch(0.78 0.22 220));
+  --gradient-success: linear-gradient(135deg, oklch(0.72 0.19 150), oklch(0.78 0.18 165));
+  --shadow-glow: 0 0 40px oklch(0.72 0.19 235 / 0.35);
+  --shadow-card: 0 8px 30px oklch(0.10 0.02 250 / 0.4);
+}
+
+.dark {
+  /* same as root - dark by default */
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html { color-scheme: dark; }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    background-image:
+      radial-gradient(ellipse 90% 50% at 50% -10%, oklch(0.72 0.19 235 / 0.10), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 100% 100%, oklch(0.72 0.19 150 / 0.06), transparent 60%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+}
+
+@utility text-gradient-electric {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility glass-card {
+  background: color-mix(in oklab, var(--card) 75%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+}
+
+@utility glow-electric {
+  box-shadow: var(--shadow-glow);
+}
