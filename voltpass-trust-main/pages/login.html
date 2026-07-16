@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoltPass | Login</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <script type="module" src="../js/login.js"></script>
+  </head>
+  <body>
+    <main class="flex min-h-screen items-center justify-center px-4 py-12">
+      <section class="w-full max-w-md">
+        <a href="../" class="mb-8 flex items-center justify-center gap-2">
+          <span class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-electric-glow glow-electric">V</span>
+          <span class="font-display text-2xl font-bold">VoltPass</span>
+        </a>
+
+        <div class="glass-card rounded-2xl p-8">
+          <h1 class="font-display text-2xl font-bold">Welcome back</h1>
+          <p class="mt-1 mb-6 text-sm text-muted-foreground">Sign in to your VoltPass account</p>
+          <p data-auth-error hidden class="mb-4 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"></p>
+          <button data-google-login class="w-full rounded-md border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent">
+            Continue with Google
+          </button>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

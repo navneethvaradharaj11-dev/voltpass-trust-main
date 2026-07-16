@@ -1,0 +1,25 @@
+@import "../src/styles.css";
+
+.auth-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.auth-loading::after {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.5rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 9999px;
+  content: "";
+  display: inline-block;
+  vertical-align: -0.15rem;
+  animation: auth-spin 0.7s linear infinite;
+}
+
+@keyframes auth-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+import { getFriendlyAuthError, signInWithGoogle } from "@/firebase/auth";
+import { isFirebaseConfigured } from "@/firebase/firebase-config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { AuthShell } from "./login";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/auth/register")({ component: Register });
 
@@ -21,6 +23,7 @@ function Register() {
   const nav = useNavigate();
   const [form, setForm] = useState({ name: "", email: "", password: "", org: "", role: "owner" });
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,11 +43,21 @@ function Register() {
   };
 
   const onGoogle = async () => {
-    const res = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/dashboard",
-    });
-    if (res.error) toast.error(res.error.message ?? "Google sign-in failed");
-    else if (!res.redirected) nav({ to: "/dashboard" });
+    if (!isFirebaseConfigured()) {
+      toast.error("Firebase is not configured. Add your VITE_FIREBASE_* values first.");
+      return;
+    }
+
+    setGoogleLoading(true);
+    try {
+      await signInWithGoogle();
+      toast.success("Signed in with Google");
+      nav({ to: "/dashboard" });
+    } catch (error) {
+      toast.error(getFriendlyAuthError(error));
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   return (
@@ -111,8 +124,9 @@ function Register() {
           <span className="bg-card px-2 text-muted-foreground">or</span>
         </div>
       </div>
-      <Button variant="outline" onClick={onGoogle} className="w-full">
-        Continue with Google
+      <Button variant="outline" onClick={onGoogle} disabled={googleLoading} className="w-full">
+        {googleLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {googleLoading ? "Opening Google..." : "Continue with Google"}
       </Button>
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Have an account?{" "}

@@ -1,11 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+import {
+  getFriendlyAuthError,
+  signInWithGoogle,
+  waitForAuthState,
+} from "@/firebase/auth";
+import { isFirebaseConfigured } from "@/firebase/firebase-config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Battery } from "lucide-react";
+import { Battery, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth/login")({ component: Login });
@@ -15,6 +20,17 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isFirebaseConfigured()) return;
+
+    waitForAuthState()
+      .then((profile) => {
+        if (profile) nav({ to: "/dashboard" });
+      })
+      .catch(() => undefined);
+  }, [nav]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,11 +43,21 @@ function Login() {
   };
 
   const onGoogle = async () => {
-    const res = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/dashboard",
-    });
-    if (res.error) toast.error(res.error.message ?? "Google sign-in failed");
-    else if (!res.redirected) nav({ to: "/dashboard" });
+    if (!isFirebaseConfigured()) {
+      toast.error("Firebase is not configured. Add your VITE_FIREBASE_* values first.");
+      return;
+    }
+
+    setGoogleLoading(true);
+    try {
+      await signInWithGoogle();
+      toast.success("Signed in with Google");
+      nav({ to: "/dashboard" });
+    } catch (error) {
+      toast.error(getFriendlyAuthError(error));
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   return (
@@ -78,8 +104,9 @@ function Login() {
           <span className="bg-card px-2 text-muted-foreground">or</span>
         </div>
       </div>
-      <Button variant="outline" onClick={onGoogle} className="w-full">
-        Continue with Google
+      <Button variant="outline" onClick={onGoogle} disabled={googleLoading} className="w-full">
+        {googleLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {googleLoading ? "Opening Google..." : "Continue with Google"}
       </Button>
       <p className="mt-6 text-center text-sm text-muted-foreground">
         No account?{" "}

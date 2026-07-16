@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/use-auth";
-import { supabase } from "@/integrations/supabase/client";
+import { signOutOfGoogle } from "@/firebase/auth";
 import { Battery, LayoutDashboard, Plus, Shield, LogOut, ScanLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -50,8 +50,8 @@ export function AppHeader() {
                 size="sm"
                 variant="ghost"
                 onClick={async () => {
-                  await supabase.auth.signOut();
-                  window.location.href = "/";
+                  await signOutOfGoogle();
+                  window.location.href = "/auth/login";
                 }}
               >
                 <LogOut className="h-4 w-4" />

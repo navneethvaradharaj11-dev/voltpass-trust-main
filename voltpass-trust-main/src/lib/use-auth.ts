@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { Session, User } from "@supabase/supabase-js";
+import { onFirebaseAuthChange, type FirebaseUserProfile } from "@/firebase/auth";
 
 export type AppRole = "admin" | "inspector" | "owner" | "buyer";
 
 export interface AuthState {
-  user: User | null;
-  session: Session | null;
+  user: FirebaseUserProfile | null;
+  session: FirebaseUserProfile | null;
   loading: boolean;
   roles: AppRole[];
   profile: { display_name: string; email: string | null; organization: string | null } | null;
@@ -23,43 +22,37 @@ export function useAuth(): AuthState {
 
   useEffect(() => {
     let alive = true;
+    let unsubscribe: (() => void) | undefined;
 
-    const loadExtras = async (user: User | null) => {
+    const loadExtras = async (user: FirebaseUserProfile | null) => {
       if (!user) {
         if (alive) setState((s) => ({ ...s, roles: [], profile: null, loading: false }));
         return;
       }
-      const [{ data: roleRows }, { data: prof }] = await Promise.all([
-        supabase.from("user_roles").select("role").eq("user_id", user.id),
-        supabase
-          .from("profiles")
-          .select("display_name,email,organization")
-          .eq("id", user.id)
-          .maybeSingle(),
-      ]);
+
       if (!alive) return;
       setState((s) => ({
         ...s,
-        roles: (roleRows ?? []).map((r) => r.role as AppRole),
-        profile: prof ?? null,
+        roles: [],
+        profile: { display_name: user.name, email: user.email, organization: null },
         loading: false,
       }));
     };
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setState((s) => ({ ...s, session, user: session?.user ?? null }));
-      // Defer DB call to avoid deadlocks
-      setTimeout(() => loadExtras(session?.user ?? null), 0);
-    });
-
-    supabase.auth.getSession().then(({ data }) => {
-      setState((s) => ({ ...s, session: data.session, user: data.session?.user ?? null }));
-      loadExtras(data.session?.user ?? null);
-    });
+    onFirebaseAuthChange((user) => {
+      setState((s) => ({ ...s, session: user, user }));
+      loadExtras(user);
+    })
+      .then((firebaseUnsubscribe) => {
+        unsubscribe = firebaseUnsubscribe;
+      })
+      .catch(() => {
+        if (alive) setState((s) => ({ ...s, loading: false }));
+      });
 
     return () => {
       alive = false;
-      sub.subscription.unsubscribe();
+      unsubscribe?.();
     };
   }, []);
 
