@@ -16,8 +16,10 @@ import {
   Line,
   CartesianGrid,
   Legend,
+  LabelList,
 } from "recharts";
 import { categorize } from "@/lib/trust-score";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
 
@@ -30,7 +32,7 @@ const COLORS = [
 ];
 
 function Dashboard() {
-  const { data: batteries = [] } = useQuery({
+  const { data: batteries = [], isLoading } = useQuery({
     queryKey: ["batteries"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -41,6 +43,17 @@ function Dashboard() {
       return data ?? [];
     },
   });
+
+  if (isLoading) {
+    return (
+      <main className="mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
+          <p className="text-sm text-muted-foreground">Loading dashboard data...</p>
+        </div>
+      </main>
+    );
+  }
 
   const total = batteries.length;
   const avg = total
@@ -103,21 +116,27 @@ function Dashboard() {
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Panel title="Trust Score Distribution">
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={trustBuckets}>
-              <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.30 0.03 250 / 0.3)" />
-              <XAxis dataKey="name" tick={{ fill: "oklch(0.68 0.03 250)", fontSize: 11 }} />
-              <YAxis tick={{ fill: "oklch(0.68 0.03 250)", fontSize: 11 }} />
+            <BarChart data={trustBuckets} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="oklch(0.30 0.03 250 / 0.2)" />
+              <XAxis dataKey="name" tick={{ fill: "oklch(0.68 0.03 250)", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "oklch(0.68 0.03 250)", fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip
+                cursor={{ fill: "oklch(0.30 0.03 250 / 0.1)" }}
                 contentStyle={{
-                  background: "oklch(0.21 0.025 250)",
-                  border: "1px solid oklch(0.30 0.03 250 / 0.6)",
-                  borderRadius: 8,
+                  background: "rgba(10, 10, 15, 0.8)",
+                  backdropFilter: "blur(8px)",
+                  border: "1px solid oklch(0.30 0.03 250 / 0.4)",
+                  borderRadius: 12,
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                  color: "#fff",
                 }}
+                itemStyle={{ color: "#fff" }}
               />
-              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+              <Bar dataKey="value" radius={[6, 6, 0, 0]} animationDuration={1500} animationEasing="ease-out">
                 {trustBuckets.map((_, i) => (
                   <Cell key={i} fill={COLORS[i]} />
                 ))}
+                <LabelList dataKey="value" position="top" fill="oklch(0.68 0.03 250)" fontSize={12} fontWeight="bold" />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -126,53 +145,82 @@ function Dashboard() {
         <Panel title="Chemistry Mix">
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
-              <Pie data={chemData} dataKey="value" nameKey="name" outerRadius={90} label>
+              <Pie
+                data={chemData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={65}
+                outerRadius={90}
+                paddingAngle={5}
+                animationDuration={1500}
+                animationEasing="ease-out"
+                stroke="none"
+                label={{ fill: "oklch(0.97 0.01 240)", fontSize: 12, fontWeight: "bold" }}
+              >
                 {chemData.map((_, i) => (
                   <Cell key={i} fill={COLORS[i % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip
                 contentStyle={{
-                  background: "oklch(0.21 0.025 250)",
-                  border: "1px solid oklch(0.30 0.03 250 / 0.6)",
-                  borderRadius: 8,
+                  background: "rgba(10, 10, 15, 0.8)",
+                  backdropFilter: "blur(8px)",
+                  border: "1px solid oklch(0.30 0.03 250 / 0.4)",
+                  borderRadius: 12,
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                  color: "#fff",
                 }}
+                itemStyle={{ color: "#fff" }}
               />
-              <Legend />
+              <Legend verticalAlign="bottom" height={36} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
         </Panel>
 
         <Panel title="State of Health vs Trust Score" className="lg:col-span-2">
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={sohData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.30 0.03 250 / 0.3)" />
-              <XAxis dataKey="name" tick={{ fill: "oklch(0.68 0.03 250)", fontSize: 10 }} />
-              <YAxis tick={{ fill: "oklch(0.68 0.03 250)", fontSize: 11 }} />
+            <LineChart data={sohData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="oklch(0.30 0.03 250 / 0.2)" />
+              <XAxis dataKey="name" tick={{ fill: "oklch(0.68 0.03 250)", fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "oklch(0.68 0.03 250)", fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip
                 contentStyle={{
-                  background: "oklch(0.21 0.025 250)",
-                  border: "1px solid oklch(0.30 0.03 250 / 0.6)",
-                  borderRadius: 8,
+                  background: "rgba(10, 10, 15, 0.8)",
+                  backdropFilter: "blur(8px)",
+                  border: "1px solid oklch(0.30 0.03 250 / 0.4)",
+                  borderRadius: 12,
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                  color: "#fff",
                 }}
+                itemStyle={{ color: "#fff" }}
               />
-              <Legend />
+              <Legend verticalAlign="top" height={36} iconType="circle" />
               <Line
                 type="monotone"
                 dataKey="soh"
                 stroke="oklch(0.72 0.19 150)"
-                strokeWidth={2}
-                dot={{ r: 3 }}
+                strokeWidth={3}
+                dot={{ r: 4, strokeWidth: 2 }}
+                activeDot={{ r: 6, strokeWidth: 0 }}
                 name="SOH %"
-              />
+                animationDuration={1500}
+              >
+                <LabelList dataKey="soh" position="top" fill="oklch(0.72 0.19 150)" fontSize={11} fontWeight="bold" />
+              </Line>
               <Line
                 type="monotone"
                 dataKey="score"
                 stroke="oklch(0.72 0.19 235)"
-                strokeWidth={2}
-                dot={{ r: 3 }}
+                strokeWidth={3}
+                dot={{ r: 4, strokeWidth: 2 }}
+                activeDot={{ r: 6, strokeWidth: 0 }}
                 name="Trust Score"
-              />
+                animationDuration={1500}
+              >
+                <LabelList dataKey="score" position="bottom" fill="oklch(0.72 0.19 235)" fontSize={11} fontWeight="bold" />
+              </Line>
             </LineChart>
           </ResponsiveContainer>
         </Panel>
@@ -209,7 +257,7 @@ function Dashboard() {
                     {cat.label}
                   </span>
                   <span className="font-display text-xl font-bold tabular-nums">
-                    {b.trust_score}
+                    <NumberTicker value={b.trust_score ?? 0} />
                   </span>
                 </div>
               </Link>
@@ -252,7 +300,7 @@ function StatCard({
         <Icon className="h-4 w-4" style={{ color: toneColor(tone) }} />
       </div>
       <div className="mt-2 font-display text-3xl font-bold tabular-nums">
-        {value}
+        <NumberTicker value={value} />
         <span className="text-base font-normal text-muted-foreground">{suffix}</span>
       </div>
     </div>

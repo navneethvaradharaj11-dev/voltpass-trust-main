@@ -27,9 +27,16 @@ export function AppHeader() {
               <NavLink to="/batteries" icon={<Battery className="h-4 w-4" />}>
                 Batteries
               </NavLink>
-              <NavLink to="/batteries/register" icon={<Plus className="h-4 w-4" />}>
-                Register
-              </NavLink>
+              <Button 
+                asChild 
+                size="sm" 
+                className="ml-2 bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[0_0_15px_oklch(0.72_0.19_235/0.3)] transition-all hover:scale-105 hover:shadow-[0_0_25px_oklch(0.72_0.19_235/0.5)]"
+              >
+                <Link to="/batteries/register">
+                  <Plus className="mr-1 h-4 w-4" />
+                  Register
+                </Link>
+              </Button>
               {isAdmin && (
                 <NavLink to="/admin" icon={<Shield className="h-4 w-4" />}>
                   Admin
@@ -65,7 +72,7 @@ export function AppHeader() {
               <Button
                 asChild
                 size="sm"
-                className="bg-gradient-to-r from-primary to-electric-glow text-primary-foreground"
+                className="bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[0_0_15px_oklch(0.72_0.19_235/0.3)] transition-all hover:scale-105 hover:shadow-[0_0_25px_oklch(0.72_0.19_235/0.5)]"
               >
                 <Link to="/auth/register">Get started</Link>
               </Button>

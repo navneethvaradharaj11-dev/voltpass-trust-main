@@ -115,7 +115,7 @@ export async function waitForAuthState() {
   const [auth, authModule] = await Promise.all([getFirebaseAuth(), getAuthModule()]);
 
   return new Promise<FirebaseUserProfile | null>((resolve) => {
-    const unsubscribe = authModule.onAuthStateChanged(auth, (user) => {
+    const unsubscribe = authModule.onAuthStateChanged(auth, (user: any) => {
       unsubscribe();
       resolve(saveAuthenticatedUser(user));
     });
@@ -127,7 +127,7 @@ export async function onFirebaseAuthChange(
 ) {
   const [auth, authModule] = await Promise.all([getFirebaseAuth(), getAuthModule()]);
 
-  return authModule.onAuthStateChanged(auth, (user) => {
+  return authModule.onAuthStateChanged(auth, (user: any) => {
     callback(saveAuthenticatedUser(user));
   });
 }

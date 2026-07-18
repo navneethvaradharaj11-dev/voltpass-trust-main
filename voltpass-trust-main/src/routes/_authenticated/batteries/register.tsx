@@ -231,7 +231,7 @@ function Register() {
             <Button
               type="submit"
               disabled={loading}
-              className="mt-6 w-full bg-gradient-to-r from-primary to-electric-glow text-primary-foreground"
+              className="mt-6 w-full rounded-xl bg-[image:var(--gradient-primary)] font-bold text-primary-foreground shadow-[0_0_20px_oklch(0.72_0.19_235/0.4)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_oklch(0.72_0.19_235/0.6)]"
             >
               {loading ? "Registering…" : "Register Battery"}
             </Button>

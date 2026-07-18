@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { categorize } from "@/lib/trust-score";
 import { Plus, Search } from "lucide-react";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 export const Route = createFileRoute("/_authenticated/batteries/")({ component: List });
 
@@ -20,9 +21,28 @@ function toneColor(tone: string) {
   );
 }
 
+function AnimatedProgress({ score, toneColor }: { score: number; toneColor: string }) {
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const t = setTimeout(() => setWidth(score), 50);
+    return () => clearTimeout(t);
+  }, [score]);
+
+  return (
+    <div
+      className="h-full rounded-full transition-all duration-1000 ease-out"
+      style={{
+        width: `${width}%`,
+        background: `linear-gradient(90deg, ${toneColor}, oklch(0.78 0.22 220))`,
+      }}
+    />
+  );
+}
+
 function List() {
   const [q, setQ] = useState("");
-  const { data: batteries = [] } = useQuery({
+
+  const { data: batteries = [], isLoading } = useQuery({
     queryKey: ["batteries-all"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -93,7 +113,7 @@ function List() {
                     className="font-display text-3xl font-bold tabular-nums"
                     style={{ color: toneColor(cat.tone) }}
                   >
-                    {b.trust_score}
+                    <NumberTicker value={b.trust_score ?? 0} />
                   </div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
                     {cat.label}
@@ -106,18 +126,18 @@ function List() {
                 <span>{b.charge_cycles} cycles</span>
               </div>
               <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${b.trust_score ?? 0}%`,
-                    background: `linear-gradient(90deg, ${toneColor(cat.tone)}, oklch(0.78 0.22 220))`,
-                  }}
-                />
+                <AnimatedProgress score={b.trust_score ?? 0} toneColor={toneColor(cat.tone)} />
               </div>
             </Link>
           );
         })}
-        {filtered.length === 0 && (
+        {isLoading && (
+          <div className="col-span-full py-16 flex flex-col items-center justify-center gap-4">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
+            <p className="text-sm text-muted-foreground">Loading batteries...</p>
+          </div>
+        )}
+        {!isLoading && filtered.length === 0 && (
           <div className="col-span-full py-12 text-center text-sm text-muted-foreground">
             No batteries match.
           </div>
