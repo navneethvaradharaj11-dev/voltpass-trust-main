@@ -401,8 +401,67 @@ CMD ["npm", "start"]
 
 ---
 
+## 🤖 AI Chatbot Assistant — VoltBot
+
+VoltPass features an integrated AI chatbot — **VoltBot** — powered by **[Chatbase](https://www.chatbase.co)**, embedded directly into the platform for real-time user assistance.
+
+### 💬 What is VoltBot?
+
+VoltBot is a trained conversational AI assistant that guides users across all VoltPass workflows — from understanding trust scores to navigating battery lifecycle decisions. It is embedded as a persistent chat widget across every page of the platform.
+
+```
+Chatbot Provider : Chatbase (chatbase.co)
+Chatbot ID       : ieYb8i-I9LjdYAJshex_6
+Embed Method     : Client-side JS snippet in <body>
+Scope            : All pages (global, via __root.tsx shell)
+```
+
+### 🧠 Training Data & Knowledge Base
+
+VoltBot was trained on a curated set of domain-specific data covering:
+
+| Topic | Data Source |
+|-------|-------------|
+| 🔋 Battery Health Metrics | SOH, charge cycles, temperature, fast-charge frequency, fault history |
+| 📊 Trust Score Algorithm | Weighted scoring formula, threshold breakpoints, recommendation logic |
+| ♻️ Lifecycle Recommendations | Reuse vs repurpose vs recycling decision matrix |
+| 👥 Multi-Role Workflows | Admin, Inspector, Owner, Buyer – their access and actions |
+| 📄 Digital Passport System | QR code verification, provenance, compliance reports |
+| 🔐 Security & RLS | Row-Level Security, audit logging, authentication flows |
+| 🌐 Platform Navigation | Dashboard, battery registration, admin panel features |
+| 🚗 EV Industry Context | Second-life batteries, circular economy, EU Battery Regulation |
+
+### ⚙️ Integration
+
+The chatbot is injected into the app shell (`src/routes/__root.tsx`) as a global script:
+
+```tsx
+// Embedded in RootShell → <body>
+<script dangerouslySetInnerHTML={{ __html: `
+  (function(){
+    // Chatbase loader — initializes VoltBot widget
+    // ID: ieYb8i-I9LjdYAJshex_6
+    window.chatbase = ...
+  })();
+` }} />
+```
+
+This ensures VoltBot is available on every authenticated and public page without needing per-route configuration.
+
+### 🎯 VoltBot Capabilities
+
+- ✅ Answer questions about **what trust scores mean**
+- ✅ Explain **lifecycle recommendations** (Reuse / Fleet / Storage / Recycle)
+- ✅ Guide users through **battery registration** and inspection workflows
+- ✅ Help **buyers** interpret QR passport data
+- ✅ Clarify **role-based permissions** and what each role can do
+- ✅ Provide **general EV battery domain knowledge**
+
+---
+
 ## 🎯 Roadmap
 
+- [x] **AI Chatbot (VoltBot)** — Chatbase-powered assistant with custom domain training
 - [ ] **Mobile App** — React Native for iOS/Android
 - [ ] **Blockchain Integration** — Immutable passport ledger
 - [ ] **AI Predictive Maintenance** — ML-based degradation forecasting

@@ -33,3 +33,10 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Tutorial output videos (large binary files)
+tutorial-output/*.mp4
+tutorial-output/*.webm
+tutorial-output/raw/
+tutorial-output/mentor-raw/
+tutorial-output/mentor-audio/
